@@ -100,6 +100,18 @@ export default {
       }
       
     }
+  },
+  computed: {
+    user() {
+      return this.$store.getters.user
+    }
+  },
+  watch: {
+    user(value){
+      if(value!==null && value!==undefined){
+        this.$router.push("users")
+      }
+    }
   }
 };
 </script>

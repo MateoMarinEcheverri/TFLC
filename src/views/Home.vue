@@ -6,12 +6,24 @@
       </v-flex>
       <v-flex xs12 class="text-xs-center" mt-3>
         <p>This is a user's home page</p>
+        <v-btn dark type="button" @click="load">Load data</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
 </template>
 <script>
+import json from "../json/data.json";
 export default {
-  //name: 'Home'
+  name: "Home",
+  data() {
+    return {
+      myJson: json
+    };
+  },
+  methods: {
+    load(){
+      //this.$store.dispatch('loadDb', this.myJson)
+    }
+  }
 };
 </script>

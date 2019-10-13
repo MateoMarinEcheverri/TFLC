@@ -4,7 +4,7 @@
       <v-flex xs12 class="text-xs-center" mt-5>
         <h1>Sign In</h1>
       </v-flex>
-      <v-flex xs12 sm6 offset-sm3 mt-3>
+      <v-flex xs12 sm4 offset-sm4 mt-3>
         <form>
           <v-layout column>
             <v-flex>
@@ -28,7 +28,7 @@
               ></v-text-field>
             </v-flex>
             <v-flex class="text-xs-center" mt-5>
-              <v-btn dark type="submit">Sign In</v-btn>
+              <v-btn dark type="button" @click="signIn">Sign In</v-btn>
             </v-flex>
           </v-layout>
         </form>
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import { watch } from 'fs';
 export default {
   name: "signin",
   data() {
@@ -47,7 +48,7 @@ export default {
     };
   },
   methods: {
-    signUp: function() {
+    signIn: function() {
       if (
         this.email === "" ||
         this.password === ""
@@ -58,6 +59,18 @@ export default {
           email: this.email,
           password: this.password
         });
+      }
+    }
+  },
+  computed: {
+    user() {
+      return this.$store.getters.user
+    }
+  },
+  watch: {
+    user(value){
+      if(value!==null && value!==undefined){
+        this.$router.push("users")
       }
     }
   }
