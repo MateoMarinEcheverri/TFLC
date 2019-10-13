@@ -13,7 +13,9 @@
                 label="Email"
                 id="email"
                 type="email"
-                required></v-text-field>
+                required
+                v-model="email"
+              ></v-text-field>
             </v-flex>
             <v-flex>
               <v-text-field
@@ -21,7 +23,9 @@
                 label="Password"
                 id="password"
                 type="password"
-                required></v-text-field>
+                v-model="password"
+                required
+              ></v-text-field>
             </v-flex>
             <v-flex class="text-xs-center" mt-5>
               <v-btn dark type="submit">Sign In</v-btn>
@@ -34,5 +38,28 @@
 </template>
 
 <script>
-export default {};
+export default {
+  name: "signin",
+  data() {
+    return {
+      email: "",
+      password: ""
+    };
+  },
+  methods: {
+    signUp: function() {
+      if (
+        this.email === "" ||
+        this.password === ""
+      ) {
+        alert("You must fill all the fields.");
+      } else {
+        this.$store.dispatch("signUserIn", {
+          email: this.email,
+          password: this.password
+        });
+      }
+    }
+  }
+};
 </script>
