@@ -4,7 +4,7 @@
       <v-app-bar color="black" dark>
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
-        <v-toolbar-title>Page title</v-toolbar-title>
+        <v-toolbar-title>Sistema Dependencias</v-toolbar-title>
 
         <div class="flex-grow-1"></div>
 
@@ -44,7 +44,7 @@ export default {
       if (this.userIsAuthenticated) {
         menuItems = [
           { title: "Users", path: "/users" },
-          { title: "Dependencies", path: "/signup" },
+          { title: "Dependencies", path: "/dependencies" },
           { title: "Log out", path: "/signin" }
         ];
       }

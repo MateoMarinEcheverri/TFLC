@@ -9,7 +9,8 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
     state: {
         user: null,
-        users: []
+        users: [],
+        dependencies: []
     },
     mutations: {
         setUser(state, payload) {
@@ -17,6 +18,9 @@ export const store = new Vuex.Store({
         },
         setUsers(state, payload) {
             state.users = payload
+        },
+        setDependencies(state, payload) {
+            state.dependencies = payload
         }
     },
     actions: {
@@ -25,25 +29,23 @@ export const store = new Vuex.Store({
             var usersRef = firebase.firestore().collection("usuarios").doc(payload.email);
             usersRef.get().then(doc => {
                 if (doc.exists) {
-                    //let newUser = doc.data()
-                    //console.log(newUser)
-                    //console.log("The email address is already in use by another account.")
                     alert("The email address is already in use by another account.")
                 } else {
                     var today = new Date();
-                    var date = (today.getFullYear()+2) + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                    var date = (today.getFullYear() + 2) + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+                    console.log(CryptoJS.MD5("Message"));
                     let user = {
                         name: payload.name,
                         lastname: payload.lastname,
                         email: payload.email,
                         dependency: payload.dependency,
-                        password: payload.password,
+                        password: CryptoJS.MD5(payload.password).toString(CryptoJS.enc.Hex),
                         validuntil: date,
                         active: "true",
                     }
                     usersRef.set(user)
                     commit('setUser', user)
-                    //console.log("User successfuly created")
+
                     alert("User successfuly created")
                 }
             })
@@ -53,19 +55,14 @@ export const store = new Vuex.Store({
             usersRef.get().then(doc => {
                 if (doc.exists) {
                     let newUser = doc.data()
-                    //console.log(newUser)
-                    if (payload.password === newUser.password) {
-                        //console.log("Login succesfull!!!")
-                        alert("Login succesfull!!!")
+                    let password = CryptoJS.MD5(payload.password).toString(CryptoJS.enc.Hex)
+                    if (password === newUser.password) {
                         commit('setUser', newUser)
-                        this.router.push('/Users') 
-                        //this.dispatch('getAllInfo')
+                        this.router.push('/Users')
                     } else {
-                        //console.log("Wrong credentials")
                         alert("Wrong credentials")
                     }
                 } else {
-                    //console.log("The email address is not registered in the system.")
                     alert("The email address is not registered in the system.")
                 }
             })
@@ -81,7 +78,6 @@ export const store = new Vuex.Store({
                         users.push(doc.data())
                     })
                 });
-            console.log(users)
             commit('setUsers', users)
         },
         getAllInfo() {
@@ -90,15 +86,43 @@ export const store = new Vuex.Store({
         saveUser({ commit }, payload) {
             firebase.firestore().collection("usuarios").doc(payload.email).set(payload)
             this.dispatch('getUsers')
+            alert("Saved successful!!")
         },
-        deleteUser({ commit }, payload){
+        deleteUser({ commit }, payload) {
             firebase.firestore().collection("usuarios").doc(payload.email).delete()
             this.dispatch('getUsers')
+            alert("Successful deletion!!")
         },
-        loadDb({ commit }, payload){
-            payload.forEach(x =>{
+        loadDb({ commit }, payload) {
+            payload.forEach(x => {
                 firebase.firestore().collection("usuarios").doc(x.email).set(x)
             })
+        },
+        // Dependencies Actions
+        getDependencies({ commit }) {
+            let dependencies = []
+            firebase.firestore().collection("dependencies").get().then(
+                querySnapshot => {
+                    querySnapshot.forEach(doc => {
+                        dependencies.push(doc.data())
+                    })
+                });
+            commit('setDependencies', dependencies)
+        },
+        deleteDependency({ commit }, payload) {
+            if (payload.users.length === 0) {
+                firebase.firestore().collection("dependencies").doc(payload.name).delete()
+                this.dispatch('getDependencies')
+                alert("Successful deletion!!")
+            } else {
+                alert("This dependency contains users")
+            }
+
+        },
+        saveDependency({ commit }, payload) {
+            firebase.firestore().collection("dependencies").doc(payload.name).set(payload)
+            this.dispatch('getDependencies')
+            alert("Saved successful!!")
         }
     },
     getters: {
@@ -107,6 +131,9 @@ export const store = new Vuex.Store({
         },
         users(state) {
             return state.users
+        },
+        dependencies(state) {
+            return state.dependencies
         }
     },
     plugins: [createPersistedState()]

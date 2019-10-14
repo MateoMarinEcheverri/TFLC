@@ -36,13 +36,16 @@
                     <v-col cols="12">
                       <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="6">
-                      <v-text-field v-model="editedItem.dependency" label="Dependency"></v-text-field>
+                     <v-col cols="12" sm="6" md="4">
+                      <v-card-text>Dependency</v-card-text>
                     </v-col>
-                    <v-col cols="12" sm="6" md="3">
+                    <v-col cols="12" sm="6" md="8">
+                      <v-select v-model="editedItem.dependency"  :items="dependencies" :label="editedItem.dependency"  solo></v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
                       <v-card-text>Active</v-card-text>
                     </v-col>
-                    <v-col cols="12" sm="6" md="3">
+                    <v-col cols="12" sm="6" md="8">
                       <v-select
                         v-model="editedItem.active"
                         :items="activevals"
@@ -140,12 +143,21 @@ export default {
     users() {
       let users = [];
       users = this.$store.getters.users;
-      console.log(users);
       return users;
     },
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    }
+    },
+    dependencies(){
+      let dependencies = [];
+      let dependencies_names = [];
+      dependencies = this.$store.getters.dependencies; 
+      for (let i = 0; i < dependencies.length; i++) {
+        dependencies_names.push(dependencies[i].name)
+      }
+      return dependencies_names;
+    },
+    
   },
   watch: {
     dialog(val) {
@@ -172,13 +184,16 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.users[this.editedIndex], this.editedItem);
-        this.$store.dispatch("saveUser", this.editedItem);
       }
+
+      this.$store.dispatch("saveUser", this.editedItem);
+
       this.close();
     }
   },
   beforeMount() {
     this.$store.dispatch("getUsers");
+    this.$store.dispatch("getDependencies");
   }
 };
 </script>
