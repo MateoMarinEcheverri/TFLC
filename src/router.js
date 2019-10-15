@@ -8,7 +8,7 @@ const routerOptions = [
   { path: "/signup", component: "SignUp" },
   { path: "/users", component: "Users" , beforeEnter: AuthGuard},
   { path: "/dependencies", component: "Dependencies" , beforeEnter: AuthGuard},
-  { path: "/TFLC", component: "Home", meta: { requiresAuth: true } },
+  { path: "/TFLC", component: "SignIn" },
   { path: "*", component: "NotFound" }
 ];
 

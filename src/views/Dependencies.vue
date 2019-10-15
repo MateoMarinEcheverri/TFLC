@@ -1,4 +1,5 @@
 <template>
+<v-app>
   <v-container fluid>
     <v-data-table :headers="headers" :items="dependencies" class="elevation-1" :search="search">
       <template v-slot:top>
@@ -71,7 +72,9 @@
             <v-card-title>
               <span class="headline">Dependency Users</span>
             </v-card-title>
+            <template>
             <v-data-table :headers="userheaders" :items="dependencyusers" class="elevation-1"></v-data-table>
+            </template>
           </v-card>
         </v-dialog>
 
@@ -80,6 +83,7 @@
       </template>
     </v-data-table>
   </v-container>
+  </v-app>
 </template>
 
 <script>
