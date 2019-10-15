@@ -8,13 +8,7 @@
         <form>
           <v-layout column>
             <v-flex>
-              <v-text-field
-                name="name"
-                label="Name"
-                id="name"
-                v-model="name"
-                required
-              ></v-text-field>
+              <v-text-field name="name" label="Name" id="name" v-model="name" required></v-text-field>
             </v-flex>
             <v-flex>
               <v-text-field
@@ -36,13 +30,7 @@
               ></v-text-field>
             </v-flex>
             <v-flex>
-              <v-text-field
-                name="dependency"
-                label="Dependency"
-                id="dependency"
-                v-model="dependency"
-                required
-              ></v-text-field>
+              <v-select v-model="dependency" :items="dependencies" label="Dependency"></v-select>
             </v-flex>
             <v-flex>
               <v-text-field
@@ -89,29 +77,53 @@ export default {
   },
   methods: {
     signUp: function() {
-      if(this.name===""||this.lastname===""||this.dependency===""||this.email===""||this.password===""||this.cpassword===""){
-        alert("You must fill all the fields.")
-      } else if(this.cpassword!=this.password){
-        alert("Password does not coincide with confirmation.")
-      } else if(this.password.length<6){
-        alert("Password must be at least 6 digists long.")
-      }else{
-        this.$store.dispatch('signUserUp', {name: this.name, lastname: this.lastname, email: this.email, dependency: this.dependency, password: this.password})
+      if (
+        this.name === "" ||
+        this.lastname === "" ||
+        this.dependency === "" ||
+        this.email === "" ||
+        this.password === "" ||
+        this.cpassword === ""
+      ) {
+        alert("You must fill all the fields.");
+      } else if (this.cpassword != this.password) {
+        alert("Password does not coincide with confirmation.");
+      } else if (this.password.length < 6) {
+        alert("Password must be at least 6 digists long.");
+      } else {
+        this.$store.dispatch("signUserUp", {
+          name: this.name,
+          lastname: this.lastname,
+          email: this.email,
+          dependency: this.dependency,
+          password: this.password
+        });
       }
-      
     }
   },
   computed: {
     user() {
-      return this.$store.getters.user
+      return this.$store.getters.user;
+    },
+    dependencies() {
+      let dependencies = [];
+      let dependencies_names = [];
+      dependencies = this.$store.getters.dependencies;
+      for (let i = 0; i < dependencies.length; i++) {
+        dependencies_names.push(dependencies[i].name);
+      }
+      return dependencies_names;
     }
   },
   watch: {
-    user(value){
-      if(value!==null && value!==undefined){
-        this.$router.push("users")
+    user(value) {
+      if (value !== null && value !== undefined) {
+        this.$router.push("users");
       }
     }
+  },
+  beforeMount() {
+    this.$store.dispatch("getDependencies");
   }
 };
 </script>

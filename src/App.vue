@@ -37,7 +37,7 @@ export default {
   computed: {
     menuItems() {
       let menuItems = [
-        { title: "Home", path: "/home" },
+        { title: "Home", path: "/TFLC" },
         { title: "Sign Up", path: "/signup" },
         { title: "Sign In", path: "/signin" }
       ];

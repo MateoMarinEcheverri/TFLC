@@ -33,7 +33,6 @@ export const store = new Vuex.Store({
                 } else {
                     var today = new Date();
                     var date = (today.getFullYear() + 2) + '-' + (today.getMonth() + 1) + '-' + today.getDate()
-                    console.log(CryptoJS.MD5("Message"));
                     let user = {
                         name: payload.name,
                         lastname: payload.lastname,
@@ -43,10 +42,25 @@ export const store = new Vuex.Store({
                         validuntil: date,
                         active: "true",
                     }
-                    usersRef.set(user)
-                    commit('setUser', user)
 
-                    alert("User successfuly created")
+                    let dependency = {};
+                    let depRef = firebase.firestore().collection("dependencies").doc(payload.dependency);
+                    depRef.get().then(function (doc) {
+                        if (doc.exists) {
+                            dependency = doc.data();
+                            if (dependency.max_users > dependency.users.length) {
+                                dependency.users.push(payload.email);
+                                depRef.set(dependency)
+                                usersRef.set(user)
+                                commit('setUser', user)
+
+                                alert("User successfuly created")
+                            } else {
+                                alert("Dependency full!!")
+                            }
+
+                        }
+                    });
                 }
             })
         },
@@ -58,7 +72,7 @@ export const store = new Vuex.Store({
                     let password = CryptoJS.MD5(payload.password).toString(CryptoJS.enc.Hex)
                     if (password === newUser.password) {
                         commit('setUser', newUser)
-                        this.router.push('/Users')
+                        router.push('/Users')
                     } else {
                         alert("Wrong credentials")
                     }
@@ -84,11 +98,88 @@ export const store = new Vuex.Store({
             this.dispatch('getUsers')
         },
         saveUser({ commit }, payload) {
-            firebase.firestore().collection("usuarios").doc(payload.email).set(payload)
+            let userRef = firebase.firestore().collection("usuarios").doc(payload.email);
+            userRef.get().then(function (doc) {
+                if (doc.exists) {
+                    let user = doc.data();
+                    if (user.dependency != payload.dependency) {
+
+                        let depRef = firebase.firestore().collection("dependencies").doc(payload.dependency);
+                        depRef.get().then(function (doc2) {
+                            if (doc2.exists) {
+                                let dependency = doc2.data();
+                                if (dependency.max_users > dependency.users.length) {
+                                    dependency.users.push(payload.email);
+                                    let dependendyRef = firebase.firestore().collection("dependencies").doc(user.dependency);
+                                    dependendyRef.get().then(function (doc3) {
+                                        if (doc3.exists) {
+                                            let dependency2 = doc3.data();
+                                            var array = dependency2.users;
+                                            let deleted = false;
+                                            for (let i = 0; i < array.length && !deleted; i++) {
+                                                if (array[i] == payload.email) {
+                                                    array.splice(i, 1);
+                                                    deleted = true;
+                                                }
+                                            }
+                                            
+                                            dependendyRef.set(dependency2)
+                                            depRef.set(dependency) 
+                                            userRef.set(payload)                                         
+                                            alert("Saved successful!!")
+                                        }
+                                    })
+                                } else {
+                                    alert("Dependency full!!")
+                                }
+
+                            }
+                        });
+                    } else {
+                        userRef.set(payload);
+                        alert("Saved successful!!")
+                    }
+
+                } else {
+                    let depRef = firebase.firestore().collection("dependencies").doc(payload.dependency);
+                    depRef.get().then(function (doc) {
+                        if (doc.exists) {
+                            let dependency = doc.data();
+                            if (dependency.max_users > dependency.users.length) {
+                                dependency.users.push(payload.email);
+                                depRef.set(dependency)
+                                userRef.set(payload);
+
+                                alert("User successfuly created")
+                            } else {
+                                alert("Dependency full!!")
+                            }
+
+                        }
+                    });
+                }
+            });
             this.dispatch('getUsers')
-            alert("Saved successful!!")
         },
         deleteUser({ commit }, payload) {
+
+            let dependency = {};
+            let depRef = firebase.firestore().collection("dependencies").doc(payload.dependency);
+            depRef.get().then(function (doc) {
+                if (doc.exists) {
+                    dependency = doc.data();
+                    var array = dependency.users;
+                    let deleted = false;
+                    for (let i = 0; i < array.length && !deleted; i++) {
+                        if (array[i] == payload.email) {
+                            array.splice(i, 1);
+                            deleted = true;
+                        }
+                    }
+                    depRef.set(dependency)
+                }
+            });
+
             firebase.firestore().collection("usuarios").doc(payload.email).delete()
             this.dispatch('getUsers')
             alert("Successful deletion!!")

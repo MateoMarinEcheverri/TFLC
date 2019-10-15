@@ -36,11 +36,16 @@
                     <v-col cols="12">
                       <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
                     </v-col>
-                     <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="4">
                       <v-card-text>Dependency</v-card-text>
                     </v-col>
                     <v-col cols="12" sm="6" md="8">
-                      <v-select v-model="editedItem.dependency"  :items="dependencies" :label="editedItem.dependency"  solo></v-select>
+                      <v-select
+                        v-model="editedItem.dependency"
+                        :items="dependencies"
+                        :label="editedItem.dependency"
+                        solo
+                      ></v-select>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-card-text>Active</v-card-text>
@@ -148,16 +153,15 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    dependencies(){
+    dependencies() {
       let dependencies = [];
       let dependencies_names = [];
-      dependencies = this.$store.getters.dependencies; 
+      dependencies = this.$store.getters.dependencies;
       for (let i = 0; i < dependencies.length; i++) {
-        dependencies_names.push(dependencies[i].name)
+        dependencies_names.push(dependencies[i].name);
       }
       return dependencies_names;
-    },
-    
+    }
   },
   watch: {
     dialog(val) {
