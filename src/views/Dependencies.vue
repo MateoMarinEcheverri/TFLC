@@ -63,6 +63,18 @@
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
+        <v-dialog v-model="detail" max-width="800px">
+          <template v-slot:activator="{ on }">
+            <v-icon small class="mr-2" v-on="on" @click="dependencyUsers(item)">fas fa-list</v-icon>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="headline">Dependency Users</span>
+            </v-card-title>
+            <v-data-table :headers="userheaders" :items="dependencyusers" class="elevation-1"></v-data-table>
+          </v-card>
+        </v-dialog>
+
         <v-icon small class="mr-2" @click="editItem(item)">edit</v-icon>
         <v-icon small @click="deleteItem(item)">delete</v-icon>
       </template>
@@ -78,6 +90,8 @@ export default {
       search: "",
       dialog: false,
       editedIndex: -1,
+      detail: false,
+      users: this.$store.getters.users,
       editedItem: {
         name: "",
         coordinator: "",
@@ -97,7 +111,8 @@ export default {
       date: new Date().toISOString().substr(0, 10),
       menu2: false,
       checkbox: true,
-      activevals: ["true", "false"]
+      activevals: ["true", "false"],
+      dependencyusers: []
     };
   },
   computed: {
@@ -109,6 +124,17 @@ export default {
         { text: "Location", value: "location" },
         { text: "Active", value: "active" },
         { text: "Actions", value: "action", sortable: false }
+      ];
+      return headers;
+    },
+    userheaders() {
+      let headers = [
+        { text: "Name", value: "name" },
+        { text: "Last Name", value: "lastname" },
+        { text: "Email", value: "email" },
+        { text: "Dependency", value: "dependency" },
+        { text: "Active", value: "active" },
+        { text: "Valid Until", value: "validuntil" }
       ];
       return headers;
     },
@@ -136,6 +162,15 @@ export default {
       confirm("Are you sure you want to delete this dependency?") &&
         this.$store.dispatch("deleteDependency", item);
     },
+    dependencyUsers(item) {
+      let dependencyUsers = [];
+      for (let i = 0; i < this.users.length; i++) {
+        if (this.users[i].dependency == item.name) {
+          dependencyUsers.push(this.users[i]);
+        }
+      }
+      this.dependencyusers = dependencyUsers
+    },
     close() {
       this.dialog = false;
       setTimeout(() => {
@@ -153,6 +188,7 @@ export default {
   },
   beforeMount() {
     this.$store.dispatch("getDependencies");
+    this.$store.dispatch("getUsers");
   }
 };
 </script>
